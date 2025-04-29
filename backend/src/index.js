@@ -29,6 +29,14 @@ const __dirname = path.resolve();
 const app = express();
 const port = process.env.PORT || 5000;
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+
 app.use(express.json()); // middleware to parse JSON data from req.body 
 
 // Pass no parameters
@@ -49,10 +57,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/songs", songsRoutes);
 app.use("/api/album", albumRoutes);
 app.use("/api/stats", statsRoutes);
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true
-}));
+
+
 
 //error handler
 app.use((error,req, res, next)=>{
