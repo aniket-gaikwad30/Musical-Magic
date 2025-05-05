@@ -1,4 +1,4 @@
-import { axiosInstance } from "@/lib/axios";
+import { axiosInstence } from "@/lib/axios";
 import { create } from "zustand";
 
 interface AuthStore {
@@ -18,12 +18,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
 	checkAdminStatus: async () => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axiosInstance.get("/admin/check");
+			const response = await axiosInstence.get("/admin/check");
 			set({ isAdmin: response.data.admin });
+			console.log("hehe");
 		} catch (error: any) {
+			console.log("Error in checkAdminStatus");
+			console.log(error);
 			set({ isAdmin: false, error: error.response.data.message });
 		} finally {
 			set({ isLoading: false });
+			console.log("Admin status checked");
 		}
 	},
 

@@ -13,7 +13,7 @@ const router = Router();
 
 router.use(protectRoute, requireAdmin);
 
-router.get("/check", checkAdmin);
+router.get("/check", requireAdmin, checkAdmin);
 
 router.post("/songs", createSong);
 router.delete("/somgs/:id", deleteSong);
