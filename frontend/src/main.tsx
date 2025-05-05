@@ -18,7 +18,7 @@ import AuthProvider from './providers/AuthProvider.tsx'
 
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+
     <ClerkProvider
       publishableKey={"pk_test_aG9wZWZ1bC1raXdpLTY2LmNsZXJrLmFjY291bnRzLmRldiQ"}
       afterSignOutUrl="/"
@@ -29,5 +29,5 @@ createRoot(document.getElementById("root")!).render(
         </BrowserRouter>
       </AuthProvider>
     </ClerkProvider>
-  </StrictMode>
+  
 );
