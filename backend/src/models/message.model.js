@@ -2,18 +2,9 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    content: {
-      type: string,
-      required: true,
-    },
-    senderID: {
-      type: string,
-      required: true,
-    },
-    receiverID: {
-      type: string,
-      required: true,
-    },
+    senderId: { type: String, required: true }, // Clerk user ID
+    receiverId: { type: String, required: true }, // Clerk user ID
+    content: { type: String, required: true },
   },
   { timestamps: true }
 );
