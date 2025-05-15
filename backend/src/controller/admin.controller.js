@@ -74,7 +74,7 @@ export const deleteSong = async (req, res, next) => {
     // If song belongs to an album, remove it from the album
     if (song.albumId) {
       await Album.findByIdAndUpdate(song.albumId, {
-        $pull: { songs: song._id }, // ✅ fixed field name
+        $pull: { songs: song._id }, 
       });
     }
 
