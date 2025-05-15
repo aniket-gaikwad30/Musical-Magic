@@ -1,36 +1,32 @@
 import express from "express";
-import { createServer } from "http";
-import cors from "cors";
 import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
-import fileupload from "express-fileupload";
+import fileUpload from "express-fileupload";
 import path from "path";
-import cron from "node-cron";
+import cors from "cors";
 import fs from "fs";
+import { createServer } from "http";
+import cron from "node-cron";
 
-import userRoutes from "./routes/user.route.js";
-import authRoutes from "./routes/auth.route.js";
-import adminRoutes from "./routes/admin.route.js";
-import songsRoutes from "./routes/songs.route.js";
-import albumRoutes from "./routes/album.route.js";
-import statsRoutes from "./routes/stats.route.js";
-
-import { connectDB } from "./lib/db.js";
 import { initializeSocket } from "./lib/socket.js";
 
-// Load environment variables
+import { connectDB } from "./lib/db.js";
+import userRoutes from "./routes/user.route.js";
+import adminRoutes from "./routes/admin.route.js";
+import authRoutes from "./routes/auth.route.js";
+import songRoutes from "./routes/songs.route.js";
+import albumRoutes from "./routes/album.route.js";
+import statRoutes from "./routes/stats.route.js";
+
 dotenv.config();
 
-const app = express();
-const port = process.env.PORT || 5000;
-
 const __dirname = path.resolve();
-const httpServer = createServer(app);
+const app = express();
+const PORT = process.env.PORT;
 
-// Initialize WebSocket
+const httpServer = createServer(app);
 initializeSocket(httpServer);
 
-// CORS middleware
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -38,79 +34,62 @@ app.use(
   })
 );
 
-// JSON body parser
-app.use(express.json());
-
-// Clerk authentication middleware
-app.use(clerkMiddleware());
-
-// File upload middleware
+app.use(express.json()); // to parse req.body
+app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
 app.use(
-  fileupload({
+  fileUpload({
     useTempFiles: true,
-    tempFileDir: path.join(__dirname, "temp"),
-    preservePath: true,
+    tempFileDir: path.join(__dirname, "tmp"),
+    createParentPath: true,
     limits: {
-      fieldSize: 10 * 1024 * 1024, // 10 MB
+      fileSize: 10 * 1024 * 1024, // 10MB  max file size
     },
   })
 );
-const tempDir = path.join(__dirname, "tmp");
 
-try {
-  cron.schedule("0 * * * *", () => {
-    console.log("Running cron cleanup at:", new Date());
-    console.log("Temp directory path:", tempDir);
+// cron jobs
+const tempDir = path.join(process.cwd(), "tmp");
+cron.schedule("0 * * * *", () => {
+  if (fs.existsSync(tempDir)) {
+    fs.readdir(tempDir, (err, files) => {
+      if (err) {
+        console.log("error", err);
+        return;
+      }
+      for (const file of files) {
+        fs.unlink(path.join(tempDir, file), (err) => {});
+      }
+    });
+  }
+});
 
-    if (fs.existsSync(tempDir)) {
-      fs.readdir(tempDir, (err, files) => {
-        if (err) {
-          console.error("Error reading temp directory:", err);
-          return;
-        }
-
-        for (const file of files) {
-          const filePath = path.join(tempDir, file);
-          fs.unlink(filePath, (err) => {
-            if (err) console.error("Error deleting file:", filePath);
-          });
-        }
-      });
-    }
-  });
-} catch (err) {
-  console.error("Cron job failed:", err);
-}
-
-
-// API routes
 app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/songs", songsRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/songs", songRoutes);
 app.use("/api/albums", albumRoutes);
-app.use("/api/stats", statsRoutes);
+app.use("/api/stats", statRoutes);
 
-// Serve frontend in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+    res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
   });
 }
 
-// Global error handler
-app.use((error, req, res, next) => {
-  res.status(500).json({
-    message:
-      process.env.NODE_ENV === "production"
-        ? "Internal server error"
-        : error.message,
-  });
+// error handler
+app.use((err, req, res, next) => {
+  res
+    .status(500)
+    .json({
+      message:
+        process.env.NODE_ENV === "production"
+          ? "Internal server error"
+          : err.message,
+    });
 });
 
-// Start server
-httpServer.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+httpServer.listen(PORT, () => {
+  console.log("Server is running on port " + PORT);
   connectDB();
 });
