@@ -21,7 +21,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 			console.log("checking admin status");
 			const response = await axiosInstence.get("/admin/check");
 			set({ isAdmin: response.data.admin });
-			console.log("hehe");
+			// console.log("hehe");
 		} catch (error: any) {
 			console.log("Error in checkAdminStatus");
 			console.log(error);
