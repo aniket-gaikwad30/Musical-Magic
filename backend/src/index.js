@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
 import fileupload from "express-fileupload";
 import path from "path";
-import fs from "fs";
 import cron from "node-cron";
+import fs from "fs";
 
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
@@ -14,18 +14,23 @@ import adminRoutes from "./routes/admin.route.js";
 import songsRoutes from "./routes/songs.route.js";
 import albumRoutes from "./routes/album.route.js";
 import statsRoutes from "./routes/stats.route.js";
+
 import { connectDB } from "./lib/db.js";
 import { initializeSocket } from "./lib/socket.js";
 
+// Load environment variables
 dotenv.config();
-const __dirname = path.resolve();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
+const __dirname = path.resolve();
 const httpServer = createServer(app);
+
+// Initialize WebSocket
 initializeSocket(httpServer);
 
+// CORS middleware
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -33,60 +38,52 @@ app.use(
   })
 );
 
+// JSON body parser
 app.use(express.json());
 
-// Add Clerk middleware
+// Clerk authentication middleware
 app.use(clerkMiddleware());
 
-// File upload configuration
+// File upload middleware
 app.use(
   fileupload({
     useTempFiles: true,
     tempFileDir: path.join(__dirname, "temp"),
     preservePath: true,
     limits: {
-      fieldSize: 10 * 1024 * 1024, // 10MB
+      fieldSize: 10 * 1024 * 1024, // 10 MB
     },
   })
 );
+const tempDir = path.join(__dirname, "tmp");
 
-// ✅ Cron job to delete files in "tmp" directory every hour
-const tempDir = path.join(process.cwd(), "tmp");
 try {
   cron.schedule("0 * * * *", () => {
-    console.log(
-      "Running cron job to clean tmp directory at",
-      new Date().toISOString()
-    );
+    console.log("Running cron cleanup at:", new Date());
+    console.log("Temp directory path:", tempDir);
 
-    if (!fs.existsSync(tempDir)) {
-      console.warn(`Directory does not exist: ${tempDir}`);
-      return;
-    }
+    if (fs.existsSync(tempDir)) {
+      fs.readdir(tempDir, (err, files) => {
+        if (err) {
+          console.error("Error reading temp directory:", err);
+          return;
+        }
 
-    fs.readdir(tempDir, (err, files) => {
-      if (err) {
-        console.error("Error reading tmp directory:", err);
-        return;
-      }
-
-      files.forEach((file) => {
-        const filePath = path.join(tempDir, file);
-        fs.unlink(filePath, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error(`Error deleting file ${file}:`, unlinkErr);
-          } else {
-            console.log(`Deleted file: ${file}`);
-          }
-        });
+        for (const file of files) {
+          const filePath = path.join(tempDir, file);
+          fs.unlink(filePath, (err) => {
+            if (err) console.error("Error deleting file:", filePath);
+          });
+        }
       });
-    });
+    }
   });
-} catch (error) {
-  console.error("Failed to schedule cron job:", error);
+} catch (err) {
+  console.error("Cron job failed:", err);
 }
 
-// Routes
+
+// API routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
@@ -102,7 +99,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// Error handler middleware
+// Global error handler
 app.use((error, req, res, next) => {
   res.status(500).json({
     message:
