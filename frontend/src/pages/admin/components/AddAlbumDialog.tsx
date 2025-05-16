@@ -9,7 +9,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { axiosInstence } from "@/lib/axios";
+import { axiosInstance } from "@/lib/axios";
 import { Plus, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -48,7 +48,7 @@ const AddAlbumDialog = () => {
 			formData.append("releaseYear", newAlbum.releaseYear.toString());
 			formData.append("imageFile", imageFile);
 
-			await axiosInstence.post("/admin/albums", formData, {
+			await axiosInstance.post("/admin/albums", formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},

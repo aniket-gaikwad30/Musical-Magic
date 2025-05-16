@@ -9,13 +9,9 @@ export const getAllAlbums = async (req, res, next) => {
 	}
 };
 
-
-
 export const getAlbumById = async (req, res, next) => {
-	// console.log("req.params", req.params);
 	try {
 		const { albumId } = req.params;
-	
 
 		const album = await Album.findById(albumId).populate("songs");
 
@@ -25,7 +21,6 @@ export const getAlbumById = async (req, res, next) => {
 
 		res.status(200).json(album);
 	} catch (error) {
-		console.log("error in getAlbumById", error);
 		next(error);
 	}
 };
