@@ -7,14 +7,15 @@
     "dev": "nodemon  src/index.js",
     "start": "node src/index.js",
     "seed:songs": "node src/seeds/songs.js",
-    "seed:albums": "node src/seeds/albums.js"
+    "seed:albums": "node src/seeds/albums.js",
+    "postinstall": "npm rebuild @clerk/express"
   },
   "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clerk/express": "1.4.19",
+    "@clerk/express": "^1.4.19",
     "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
