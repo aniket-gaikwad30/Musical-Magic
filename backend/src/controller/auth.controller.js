@@ -1,26 +1,24 @@
 import { User } from "../models/user.model.js";
 
 export const authCallback = async (req, res, next) => {
-  try {
-    const { id, firstName, lastName, imageUrl } = req.body;
-    // console.log(" im here in auth controller", id, firstName, lastName, imageUrl);
-    console.log(req.body);
-    console.log(process.env.ADMIN_EMAIL);
-    // check if user already exists
-    const user = await User.findOne({ clerkId: id });
+	try {
+		const { id, firstName, lastName, imageUrl } = req.body;
 
-    if (!user) {
-      // signup
-      await User.create({
-        clerkId: id,
-        fullName: `${firstName || ""} ${lastName || ""}`.trim(),
-        imageUrl,
-      });
-    }
+		// check if user already exists
+		const user = await User.findOne({ clerkId: id });
 
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.log("Error in auth callback", error);
-    next(error);
-  }
+		if (!user) {
+			// signup
+			await User.create({
+				clerkId: id,
+				fullName: `${firstName || ""} ${lastName || ""}`.trim(),
+				imageUrl,
+			});
+		}
+
+		res.status(200).json({ success: true });
+	} catch (error) {
+		console.log("Error in auth callback", error);
+		next(error);
+	}
 };

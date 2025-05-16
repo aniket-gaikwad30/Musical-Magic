@@ -1,143 +1,114 @@
-import { Songs } from "../models/songs.model.js";
+import { Song } from "../models/song.model.js";
 import { Album } from "../models/album.model.js";
 import cloudinary from "../lib/cloudinary.js";
 
-// helper function for Cloudinary uploads
+// helper function for cloudinary uploads
 const uploadToCloudinary = async (file) => {
-  try {
-    const result = await cloudinary.uploader.upload(file.tempFilePath, {
-      resource_type: "auto",
-    });
-    return result.secure_url;
-  } catch (error) {
-    console.log("Error in uploadToCloudinary", error);
-    throw new Error("Error uploading to cloudinary");
-  }
+	try {
+		const result = await cloudinary.uploader.upload(file.tempFilePath, {
+			resource_type: "auto",
+		});
+		return result.secure_url;
+	} catch (error) {
+		console.log("Error in uploadToCloudinary", error);
+		throw new Error("Error uploading to cloudinary");
+	}
 };
 
-// Create a new song
 export const createSong = async (req, res, next) => {
-  try {
-    if (!req.files || !req.files.audioFile || !req.files.imageFile) {
-      return res
-        .status(400)
-        .json({ message: "Please upload audio and image files" });
-    }
+	try {
+		if (!req.files || !req.files.audioFile || !req.files.imageFile) {
+			return res.status(400).json({ message: "Please upload all files" });
+		}
 
-    const { title, artist, albumId, duration } = req.body;
+		const { title, artist, albumId, duration } = req.body;
+		const audioFile = req.files.audioFile;
+		const imageFile = req.files.imageFile;
 
-    if (!title || !artist || !duration) {
-      return res.status(400).json({ message: "Missing required song fields" });
-    }
+		const audioUrl = await uploadToCloudinary(audioFile);
+		const imageUrl = await uploadToCloudinary(imageFile);
 
-    const audioFile = req.files.audioFile;
-    const imageFile = req.files.imageFile;
+		const song = new Song({
+			title,
+			artist,
+			audioUrl,
+			imageUrl,
+			duration,
+			albumId: albumId || null,
+		});
 
-    const audioUrl = await uploadToCloudinary(audioFile);
-    const imageUrl = await uploadToCloudinary(imageFile);
+		await song.save();
 
-    const song = new Songs({
-      title,
-      artist,
-      audioUrl,
-      imageUrl,
-      duration,
-      albumId: albumId || null,
-    });
-
-    await song.save();
-
-    // If song belongs to an album, update the album's songs array
-    if (albumId) {
-      await Album.findByIdAndUpdate(albumId, {
-        $push: { songs: song._id }, // ✅ fixed field name
-      });
-    }
-
-    res.status(201).json(song);
-  } catch (error) {
-    console.log("Error in createSong", error);
-    next(error);
-  }
+		// if song belongs to an album, update the album's songs array
+		if (albumId) {
+			await Album.findByIdAndUpdate(albumId, {
+				$push: { songs: song._id },
+			});
+		}
+		res.status(201).json(song);
+	} catch (error) {
+		console.log("Error in createSong", error);
+		next(error);
+	}
 };
 
-// Delete a song by ID
 export const deleteSong = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+	try {
+		const { id } = req.params;
 
-    const song = await Songs.findById(id);
-    if (!song) {
-      return res.status(404).json({ message: "Song not found" });
-    }
+		const song = await Song.findById(id);
 
-    // If song belongs to an album, remove it from the album
-    if (song.albumId) {
-      await Album.findByIdAndUpdate(song.albumId, {
-        $pull: { songs: song._id }, 
-      });
-    }
+		// if song belongs to an album, update the album's songs array
+		if (song.albumId) {
+			await Album.findByIdAndUpdate(song.albumId, {
+				$pull: { songs: song._id },
+			});
+		}
 
-    await Songs.findByIdAndDelete(id);
+		await Song.findByIdAndDelete(id);
 
-    res.status(200).json({ message: "Song deleted successfully" });
-  } catch (error) {
-    console.log("Error in deleteSong", error);
-    next(error);
-  }
+		res.status(200).json({ message: "Song deleted successfully" });
+	} catch (error) {
+		console.log("Error in deleteSong", error);
+		next(error);
+	}
 };
 
-// Create a new album
 export const createAlbum = async (req, res, next) => {
-  try {
-    const { title, artist, releaseYear } = req.body;
+	try {
+		const { title, artist, releaseYear } = req.body;
+		const { imageFile } = req.files;
 
-    if (!req.files || !req.files.imageFile) {
-      return res.status(400).json({ message: "Please upload an album image" });
-    }
+		const imageUrl = await uploadToCloudinary(imageFile);
 
-    if (!title || !artist || !releaseYear) {
-      return res.status(400).json({ message: "Missing album fields" });
-    }
+		const album = new Album({
+			title,
+			artist,
+			imageUrl,
+			releaseYear,
+		});
 
-    const imageFile = req.files.imageFile;
-    const imageUrl = await uploadToCloudinary(imageFile);
+		await album.save();
 
-    const album = new Album({
-      title,
-      artist,
-      imageUrl,
-      releaseYear,
-    });
-
-    await album.save();
-
-    res.status(201).json(album);
-  } catch (error) {
-    console.log("Error in createAlbum", error);
-    next(error);
-  }
+		res.status(201).json(album);
+	} catch (error) {
+		console.log("Error in createAlbum", error);
+		next(error);
+	}
 };
 
-// Delete an album and its songs
 export const deleteAlbum = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    await Songs.deleteMany({ albumId: id }); // ✅ fixed model name
-    await Album.findByIdAndDelete(id);
-
-    res
-      .status(200)
-      .json({ message: "Album and its songs deleted successfully" });
-  } catch (error) {
-    console.log("Error in deleteAlbum", error);
-    next(error);
-  }
+	try {
+		const { id } = req.params;
+		await Song.deleteMany({ albumId: id });
+		await Album.findByIdAndDelete(id);
+		res.status(200).json({ message: "Album deleted successfully" });
+	} catch (error) {
+		console.log("Error in deleteAlbum", error);
+		next(error);
+	}
 };
 
-// Dummy checkAdmin route
 export const checkAdmin = async (req, res, next) => {
-  console.log("in checkAdmin");
-  res.status(200).json({ admin: true });
+	res.status(200).json({ admin: true });
 };

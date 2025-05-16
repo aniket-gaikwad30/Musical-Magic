@@ -3,8 +3,6 @@ import { Music } from "lucide-react";
 import SongsTable from "./SongsTable";
 import AddSongDialog from "./AddSongDialog";
 
-
-
 const SongsTabContent = () => {
 	return (
 		<Card>
