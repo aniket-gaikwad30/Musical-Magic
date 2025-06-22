@@ -11,6 +11,9 @@
     "build" : "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
     "start": "npm start --prefix backend"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aniket-gaikwad30/Musical-Magic.git"

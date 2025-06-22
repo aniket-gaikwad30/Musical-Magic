@@ -6,7 +6,7 @@ import path from "path";
 import cors from "cors";
 import fs from "fs";
 import { createServer } from "http";
-import cron from "node-cron/src/node-cron.js";
+import cron from "node-cron";
 
 import { initializeSocket } from "./lib/socket.js";
 
