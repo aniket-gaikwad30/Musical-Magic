@@ -12,7 +12,7 @@
     "start": "npm start --prefix backend"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "repository": {
     "type": "git",
