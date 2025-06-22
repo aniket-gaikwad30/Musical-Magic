@@ -44,10 +44,19 @@ app.use(
 	})
 );
 
+app.use(
+	express.json({
+		verify: (req, res, buf) => {
+			if (req.originalUrl === "/api/auth/callback") {
+				req.rawBody = buf;
+			}
+		},
+	})
+); // to parse req.body
+
 // hook route
 app.use("/api/auth", authRoutes);
 
-app.use(express.json()); // to parse req.body
 app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
 
 app.use("/api/users", userRoutes);

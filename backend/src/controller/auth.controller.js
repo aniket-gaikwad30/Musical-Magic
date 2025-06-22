@@ -3,7 +3,7 @@ import { User } from "../models/user.model.js";
 
 export const authCallback = async (req, res, next) => {
 	try {
-		const payload = req.body;
+		const payload = req.rawBody;
 		const headers = req.headers;
 
 		const wh = new Webhook(process.env.WEBHOOK_SECRET);
