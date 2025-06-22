@@ -34,3 +34,23 @@ export const authCallback = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const syncUser = async (req, res, next) => {
+	try {
+		const { id, first_name, last_name, image_url } = req.body;
+
+		const user = await User.findOneAndUpdate(
+			{ clerkId: id },
+			{
+				fullName: `${first_name || ""} ${last_name || ""}`.trim(),
+				imageUrl: image_url,
+			},
+			{ upsert: true, new: true }
+		);
+
+		res.json(user);
+	} catch (error) {
+		console.log("Error in sync user", error);
+		next(error);
+	}
+};
