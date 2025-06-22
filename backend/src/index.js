@@ -34,8 +34,6 @@ app.use(
 	})
 );
 
-app.use(express.json()); // to parse req.body
-app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
 app.use(
 	fileUpload({
 		useTempFiles: true,
@@ -46,6 +44,12 @@ app.use(
 		},
 	})
 );
+
+// hook route
+app.use("/api/auth", authRoutes);
+
+app.use(express.json()); // to parse req.body
+app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
 
 // cron jobs
 const tempDir = path.join(process.cwd(), "tmp");
@@ -65,7 +69,6 @@ cron.schedule("0 * * * *", () => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
 app.use("/api/albums", albumRoutes);
 app.use("/api/stats", statRoutes);
