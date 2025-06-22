@@ -52,13 +52,10 @@ app.use(
 			}
 		},
 	})
-); // to parse req.body
+);
 
-// hook route
 app.use("/api/auth", authRoutes);
-
-app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
-
+app.use(clerkMiddleware());
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/songs", songRoutes);
