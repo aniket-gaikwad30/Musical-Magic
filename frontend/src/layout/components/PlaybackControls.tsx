@@ -50,10 +50,17 @@ export const PlaybackControls = () => {
 	};
 
 	return (
-		<footer className='h-20 sm:h-24 bg-zinc-900 border-t border-zinc-800 px-4'>
+		<footer className='bottom-20
+	sm:bottom-0
+	fixed 
+	left-0 right-0 
+	h-20 
+	bg-zinc-900 border-t border-zinc-800 
+	px-4 
+	z-50'>
 			<div className='flex justify-between items-center h-full max-w-[1800px] mx-auto'>
 				{/* currently playing song */}
-				<div className='hidden sm:flex items-center gap-4 min-w-[180px] w-[30%]'>
+				<div className='flex items-center gap-4 min-w-[180px] w-[30%]'>
 					{currentSong && (
 						<>
 							<img
@@ -62,7 +69,7 @@ export const PlaybackControls = () => {
 								className='w-14 h-14 object-cover rounded-md'
 							/>
 							<div className='flex-1 min-w-0'>
-								<div className='font-medium truncate hover:underline cursor-pointer'>
+								<div className='font-medium truncate hover:underline cursor-pointer text-sm'>
 									{currentSong.title}
 								</div>
 								<div className='text-sm text-zinc-400 truncate hover:underline cursor-pointer'>
@@ -74,8 +81,8 @@ export const PlaybackControls = () => {
 				</div>
 
 				{/* player controls*/}
-				<div className='flex flex-col items-center gap-2 flex-1 max-w-full sm:max-w-[45%]'>
-					<div className='flex items-center gap-4 sm:gap-6'>
+				<div className='flex flex-col items-center gap-2 flex-1 max-w-[45%]'>
+					<div className='flex items-center gap-6'>
 						<Button
 							size='icon'
 							variant='ghost'
@@ -133,7 +140,7 @@ export const PlaybackControls = () => {
 					</div>
 				</div>
 				{/* volume controls */}
-				<div className='hidden sm:flex items-center gap-4 min-w-[180px] w-[30%] justify-end'>
+				<div className='hidden sm:flex items-center gap-2 sm:gap-4 min-w-[120px] sm:min-w-[180px] w-[25%] sm:w-[30%] justify-end'>
 					<Button size='icon' variant='ghost' className='hover:text-white text-zinc-400'>
 						<Mic2 className='h-4 w-4' />
 					</Button>
@@ -153,7 +160,7 @@ export const PlaybackControls = () => {
 							value={[volume]}
 							max={100}
 							step={1}
-							className='w-24 hover:cursor-grab active:cursor-grabbing'
+							className='w-16 sm:w-24 hover:cursor-grab active:cursor-grabbing'
 							onValueChange={(value) => {
 								setVolume(value[0]);
 								if (audioRef.current) {
