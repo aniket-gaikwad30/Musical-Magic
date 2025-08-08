@@ -20,10 +20,10 @@ const FeaturedSection = () => {
 					<img
 						src={song.imageUrl}
 						alt={song.title}
-						className='w-16 sm:w-20 h-16 sm:h-20 object-cover flex-shrink-0'
+						className='w-16 h-16 sm:w-20 sm:h-20 object-cover flex-shrink-0'
 					/>
 					<div className='flex-1 p-4'>
-						<p className='font-medium truncate'>{song.title}</p>
+						<p className='font-medium truncate text-sm'>{song.title}</p>
 						<p className='text-sm text-zinc-400 truncate'>{song.artist}</p>
 					</div>
 					<PlayButton song={song} />
