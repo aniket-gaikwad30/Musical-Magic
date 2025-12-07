@@ -24,7 +24,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				updateApiToken(token);
 				if (token && user) {
 					// sync user
-					await axiosInstance.post("/syncUser", {
+					await axiosInstance.post("/api/auth/sync", {
 						id: user.id,
 						first_name: user.firstName,
 						last_name: user.lastName,
