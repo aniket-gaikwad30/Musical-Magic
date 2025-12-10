@@ -17,7 +17,7 @@ const AuthCallbackPage = () => {
 			try {
 				syncAttempted.current = true;
 
-				await axiosInstance.post("api/auth/callback", {
+				await axiosInstance.post("/auth/callback", {
 					id: user.id,
 					firstName: user.firstName,
 					lastName: user.lastName,
@@ -34,12 +34,12 @@ const AuthCallbackPage = () => {
 	}, [isLoaded, user, navigate]);
 
 	return (
-		<div className='h-screen w-full bg-black flex items-center justify-center'>
+		<div className='flex items-center justify-center w-full h-screen bg-black'>
 			<Card className='w-[90%] max-w-md bg-zinc-900 border-zinc-800'>
 				<CardContent className='flex flex-col items-center gap-4 pt-6'>
 					<Loader className='size-6 text-emerald-500 animate-spin' />
-					<h3 className='text-zinc-400 text-xl font-bold'>Logging you in</h3>
-					<p className='text-zinc-400 text-sm'>Redirecting...</p>
+					<h3 className='text-xl font-bold text-zinc-400'>Logging you in</h3>
+					<p className='text-sm text-zinc-400'>Redirecting...</p>
 				</CardContent>
 			</Card>
 		</div>

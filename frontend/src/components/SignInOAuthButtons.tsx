@@ -12,12 +12,12 @@ const SignInOAuthButtons = () => {
 		signIn.authenticateWithRedirect({
 			strategy: "oauth_google",
 			redirectUrl: "/sso-callback",
-			redirectUrlComplete: "/api/auth/callback",
+			redirectUrlComplete: "/auth/callback",
 		});
 	};
 
 	return (
-		<Button onClick={signInWithGoogle} variant={"secondary"} className='w-full text-white border-zinc-200 h-9 sm:h-11 text-xs sm:text-sm'>
+		<Button onClick={signInWithGoogle} variant={"secondary"} className='w-full text-xs text-white border-zinc-200 h-9 sm:h-11 sm:text-sm'>
 			<img src='/google.png' alt='Google' className='size-4 sm:size-5' />
 			<span className='hidden sm:inline'>Continue with Google</span>
 			<span className='sm:hidden'>Sign In</span>

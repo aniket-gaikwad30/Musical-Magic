@@ -24,7 +24,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				updateApiToken(token);
 				if (token && user) {
 					// sync user
-					await axiosInstance.post("/api/auth/sync", {
+					await axiosInstance.post("/auth/sync", {
 						id: user.id,
 						first_name: user.firstName,
 						last_name: user.lastName,
@@ -51,7 +51,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	if (loading)
 		return (
-			<div className='h-screen w-full flex items-center justify-center'>
+			<div className='flex items-center justify-center w-full h-screen'>
 				<Loader className='size-8 text-emerald-500 animate-spin' />
 			</div>
 		);
